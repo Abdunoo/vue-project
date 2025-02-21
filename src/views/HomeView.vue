@@ -6,7 +6,7 @@ import { useHead } from '@vueuse/head'
 const siteConfig = {
   siteName: 'Testing Meta Seo',
   baseUrl: 'https://test-meta-pink.vercel.app',
-  image: '/maxresdefault.jpg',
+  defaultImage: '/maxresdefault.jpg',
   twitterHandle: '@yourhandle',
   facebookAppId: '123456789',
   themeColor: '#ffffff',
@@ -20,64 +20,77 @@ const siteConfig = {
 // Page-specific data with dummy content
 const pageData = ref({
   title: 'Improving SEO with Meta Tags',
-  description: 'This is a comprehensive site dedicated to providing insightful and engaging content on a variety of topics. Our goal is to offer valuable information, tips, and resources to help you stay informed and inspired. Whether you\'re looking for the latest news, in-depth articles, or practical advice, our site has something for everyone. Join our community and explore a wealth of knowledge designed to enrich your life and broaden your horizons. Stay connected with us for regular updates and fresh content tailored to your interests and needs.',
+  description: 'This is a comprehensive site dedicated to providing insightful and engaging content on a variety of topics. Our goal is to offer valuable information, tips, and resources to help you stay informed and inspired.',
   image: '/maxresdefault.jpg',
   path: '/',
   author: 'Author Name is Hidden',
   publishedTime: new Date().toISOString(),
   modifiedTime: new Date().toISOString(),
   tags: ['SEO', 'Meta Tags', 'SEO Tips', 'SEO Techniques'],
-  type: 'website' // or 'website', 'product', etc.
+  type: 'article' // Changed from 'website' to 'article' for better sharing
 })
 
 // Computed values for sharing
 const fullUrl = computed(() => `${siteConfig.baseUrl}${pageData.value.path}`)
 const shareTitle = computed(() => `${pageData.value.title} | ${siteConfig.siteName}`)
 
+// Compute full image URL
+const fullImageUrl = computed(() => `${siteConfig.baseUrl}${pageData.value.image}`)
+
 // Generate all meta tags
 useHead({
   title: pageData.value.title,
   titleTemplate: `%s | ${siteConfig.siteName}`,
   htmlAttrs: {
-    lang: siteConfig.language
+    lang: siteConfig.language,
+    dir: 'ltr'
   },
   meta: [
     // Essential SEO
     { name: 'description', content: pageData.value.description },
     { name: 'keywords', content: pageData.value.tags.join(', ') },
     { name: 'author', content: pageData.value.author },
-    { name: 'robots', content: 'index, follow' },
+    { name: 'robots', content: 'index, follow, max-image-preview:large' },
     { name: 'googlebot', content: 'index, follow' },
     
-    // Open Graph
+    // Open Graph (WhatsApp and Facebook)
     { property: 'og:type', content: pageData.value.type },
     { property: 'og:title', content: shareTitle.value },
     { property: 'og:description', content: pageData.value.description },
-    { property: 'og:image', content: pageData.value.image },
+    { property: 'og:image', content: fullImageUrl.value },
+    { property: 'og:image:secure_url', content: fullImageUrl.value },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:type', content: 'image/jpeg' },
     { property: 'og:url', content: fullUrl.value },
     { property: 'og:site_name', content: siteConfig.siteName },
     { property: 'og:locale', content: 'en_US' },
-    { property: 'og:article:published_time', content: pageData.value.publishedTime },
-    { property: 'og:article:modified_time', content: pageData.value.modifiedTime },
-    { property: 'og:article:author', content: pageData.value.author },
-    { property: 'og:article:tag', content: pageData.value.tags.join(', ') },
+    { property: 'og:updated_time', content: pageData.value.modifiedTime },
     
-    // Twitter
+    // Article specific (for better sharing)
+    { property: 'article:published_time', content: pageData.value.publishedTime },
+    { property: 'article:modified_time', content: pageData.value.modifiedTime },
+    { property: 'article:author', content: pageData.value.author },
+    { property: 'article:tag', content: pageData.value.tags.join(', ') },
+    
+    // Twitter Card
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:site', content: siteConfig.twitterHandle },
     { name: 'twitter:creator', content: siteConfig.twitterHandle },
     { name: 'twitter:title', content: shareTitle.value },
     { name: 'twitter:description', content: pageData.value.description },
-    { name: 'twitter:image', content: pageData.value.image },
+    { name: 'twitter:image', content: fullImageUrl.value },
     { name: 'twitter:image:alt', content: pageData.value.title },
+    { name: 'twitter:domain', content: siteConfig.baseUrl },
     
     // Additional SEO
     { name: 'theme-color', content: siteConfig.themeColor },
     { name: 'apple-mobile-web-app-capable', content: 'yes' },
     { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
+    { name: 'format-detection', content: 'telephone=no' },
     
-    // Viewport (if not already in index.html)
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    // Viewport
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=5' }
   ],
   link: [
     { rel: 'canonical', href: fullUrl.value },
@@ -90,13 +103,13 @@ useHead({
   ]
 })
 
-// Sharing functions
+// Update sharing functions
 const shareLinks = computed(() => ({
-  whatsapp: `whatsapp://send?text=${encodeURIComponent(`${shareTitle.value} - ${fullUrl.value}`)}`,
+  whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareTitle.value}\n${pageData.value.description}\n${fullUrl.value}`)}`,
   facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl.value)}`,
   twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle.value)}&url=${encodeURIComponent(fullUrl.value)}&via=${siteConfig.twitterHandle.slice(1)}`,
   linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(fullUrl.value)}&title=${encodeURIComponent(shareTitle.value)}&summary=${encodeURIComponent(pageData.value.description)}`,
-  pinterest: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(fullUrl.value)}&media=${encodeURIComponent(pageData.value.image)}&description=${encodeURIComponent(pageData.value.description)}`
+  pinterest: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(fullUrl.value)}&media=${encodeURIComponent(fullImageUrl.value)}&description=${encodeURIComponent(pageData.value.description)}`
 }))
 
 // Add this share function
