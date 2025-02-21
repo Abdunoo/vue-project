@@ -2,11 +2,13 @@ import { createApp } from 'vue'
 import { renderSSRHead } from '@unhead/ssr'
 import { createHead } from '@unhead/vue'
 import App from './App.vue'
-import router from './router'
+import { createRouter } from './router'
+import { renderToString } from '@vue/server-renderer'
 
 export async function render(url) {
   const app = createApp(App)
   const head = createHead()
+  const router = createRouter()
   
   app.use(head)
   app.use(router)

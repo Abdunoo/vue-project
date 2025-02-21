@@ -4,14 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "dev": "node server",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --outDir dist/server --ssr src/entry-server.js",
+    "serve": "NODE_ENV=production node server"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
     "@unhead/ssr": "^1.8.0",
     "@unhead/vue": "^1.8.0",
+    "@vue/server-renderer": "^3.5.13",
+    "compression": "^1.8.0",
+    "express": "^4.21.2",
+    "serve-static": "^1.16.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
