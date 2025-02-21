@@ -4,22 +4,30 @@ import { useHead } from '@vueuse/head'
 
 // Configuration object with all your site's sharing data
 const siteConfig = {
-  siteName: 'Demo Website',
-  baseUrl: import.meta.env.VITE_BASE_URL || 'https://demo-site.com', // Updated to use env variable
-  defaultImage: '/maxresdefault.jpg',
-  twitterHandle: '@demohandle',
+  siteName: 'Testing Meta Seo',
+  baseUrl: 'https://test-meta-pink.vercel.app',
+  image: '/maxresdefault.jpg',
+  twitterHandle: '@yourhandle',
   facebookAppId: '123456789',
+  themeColor: '#ffffff',
+  language: 'en',
+  alternateLanguages: [
+    { lang: 'es', url: 'https://test-meta-pink.vercel.app' },
+    { lang: 'fr', url: 'https://test-meta-pink.vercel.app' }
+  ]
 }
 
 // Page-specific data with dummy content
 const pageData = ref({
-  title: 'Sample Blog Post',
-  description: 'This is a demonstration of a blog post with social sharing capabilities. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  title: 'Improving SEO with Meta Tags',
+  description: 'This is a comprehensive site dedicated to providing insightful and engaging content on a variety of topics. Our goal is to offer valuable information, tips, and resources to help you stay informed and inspired. Whether you\'re looking for the latest news, in-depth articles, or practical advice, our site has something for everyone. Join our community and explore a wealth of knowledge designed to enrich your life and broaden your horizons. Stay connected with us for regular updates and fresh content tailored to your interests and needs.',
   image: '/maxresdefault.jpg',
-  path: '/sample-post',
-  author: 'Jane Smith',
+  path: '/',
+  author: 'Author Name is Hidden',
   publishedTime: new Date().toISOString(),
-  tags: ['demo', 'sample', 'test', 'example'],
+  modifiedTime: new Date().toISOString(),
+  tags: ['SEO', 'Meta Tags', 'SEO Tips', 'SEO Techniques'],
+  type: 'website' // or 'website', 'product', etc.
 })
 
 // Computed values for sharing
@@ -28,19 +36,21 @@ const shareTitle = computed(() => `${pageData.value.title} | ${siteConfig.siteNa
 
 // Generate all meta tags
 useHead({
-  // Basic page title and template
   title: pageData.value.title,
   titleTemplate: `%s | ${siteConfig.siteName}`,
-
-  // Meta tags
+  htmlAttrs: {
+    lang: siteConfig.language
+  },
   meta: [
-    // Basic SEO
+    // Essential SEO
     { name: 'description', content: pageData.value.description },
     { name: 'keywords', content: pageData.value.tags.join(', ') },
     { name: 'author', content: pageData.value.author },
+    { name: 'robots', content: 'index, follow' },
+    { name: 'googlebot', content: 'index, follow' },
     
-    // Open Graph (Facebook, WhatsApp, etc.)
-    { property: 'og:type', content: 'article' },
+    // Open Graph
+    { property: 'og:type', content: pageData.value.type },
     { property: 'og:title', content: shareTitle.value },
     { property: 'og:description', content: pageData.value.description },
     { property: 'og:image', content: pageData.value.image },
@@ -48,18 +58,11 @@ useHead({
     { property: 'og:site_name', content: siteConfig.siteName },
     { property: 'og:locale', content: 'en_US' },
     { property: 'og:article:published_time', content: pageData.value.publishedTime },
+    { property: 'og:article:modified_time', content: pageData.value.modifiedTime },
     { property: 'og:article:author', content: pageData.value.author },
     { property: 'og:article:tag', content: pageData.value.tags.join(', ') },
     
-    // Image specifications
-    { property: 'og:image:width', content: '1200' },
-    { property: 'og:image:height', content: '630' },
-    { property: 'og:image:alt', content: pageData.value.title },
-    
-    // Facebook specific
-    { property: 'fb:app_id', content: siteConfig.facebookAppId },
-    
-    // Twitter Card
+    // Twitter
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:site', content: siteConfig.twitterHandle },
     { name: 'twitter:creator', content: siteConfig.twitterHandle },
@@ -68,54 +71,22 @@ useHead({
     { name: 'twitter:image', content: pageData.value.image },
     { name: 'twitter:image:alt', content: pageData.value.title },
     
-    // WhatsApp specific (uses Open Graph but with some size considerations)
-    { property: 'og:image:type', content: 'image/jpeg' },
+    // Additional SEO
+    { name: 'theme-color', content: siteConfig.themeColor },
+    { name: 'apple-mobile-web-app-capable', content: 'yes' },
+    { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
     
-    // Pinterest specific
-    { name: 'pinterest-rich-pin', content: 'true' },
-    
-    // LinkedIn specific
-    { property: 'linkedin:owner', content: siteConfig.siteName },
-    { property: 'linkedin:title', content: shareTitle.value },
-    { property: 'linkedin:description', content: pageData.value.description },
-    { property: 'linkedin:image', content: pageData.value.image },
+    // Viewport (if not already in index.html)
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
   ],
-
-  // Link tags
   link: [
     { rel: 'canonical', href: fullUrl.value },
-    { rel: 'image_src', href: pageData.value.image },
-  ],
-
-  // Structured data for Google
-  script: [
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: pageData.value.title,
-        image: pageData.value.image,
-        author: {
-          '@type': 'Person',
-          name: pageData.value.author
-        },
-        publisher: {
-          '@type': 'Organization',
-          name: siteConfig.siteName,
-          logo: {
-            '@type': 'ImageObject',
-            url: siteConfig.defaultImage
-          }
-        },
-        datePublished: pageData.value.publishedTime,
-        description: pageData.value.description,
-        mainEntityOfPage: {
-          '@type': 'WebPage',
-          '@id': fullUrl.value
-        }
-      })
-    }
+    { rel: 'alternate', hreflang: 'x-default', href: fullUrl.value },
+    ...siteConfig.alternateLanguages.map(({ lang, url }) => ({
+      rel: 'alternate',
+      hreflang: lang,
+      href: url
+    }))
   ]
 })
 
