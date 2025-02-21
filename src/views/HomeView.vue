@@ -5,7 +5,7 @@ import { useHead } from '@vueuse/head'
 // Configuration object with all your site's sharing data
 const siteConfig = {
   siteName: 'Demo Website',
-  baseUrl: 'https://demo-site.com',
+  baseUrl: import.meta.env.VITE_BASE_URL || 'https://demo-site.com', // Updated to use env variable
   defaultImage: '/maxresdefault.jpg',
   twitterHandle: '@demohandle',
   facebookAppId: '123456789',
