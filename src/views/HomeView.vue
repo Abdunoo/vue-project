@@ -1,13 +1,13 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 // Configuration object with all your site's sharing data
 const siteConfig = {
   siteName: 'Testing Meta Seo',
   baseUrl: 'https://test-meta-pink.vercel.app',
   defaultImage: '/maxresdefault.jpg',
-  twitterHandle: '@yourhandle',
+  twitterHandle: '@testingmeta',
   facebookAppId: '123456789',
   themeColor: '#ffffff',
   language: 'en',
